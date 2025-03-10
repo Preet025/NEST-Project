@@ -2,7 +2,6 @@ import {
   Controller,
   Get,
   Post,
-  Body,
   Patch,
   Param,
   Delete,
@@ -11,6 +10,7 @@ import {
   UseGuards,
   Req,
   ParseIntPipe,
+  BadRequestException,
 } from '@nestjs/common';
 import { DocumentsService } from './documents.service';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -27,11 +27,14 @@ export class DocumentsController {
   @UseGuards(RolesGuard)
   @UseInterceptors(FileInterceptor('file'))
   create(@UploadedFile() file: Express.Multer.File, @Req() req: Request) {
+    if (!file || !file.originalname) {
+      throw new BadRequestException('Valid file is required');
+    }
     return this.documentsService.create(file, req.user.id);
   }
 
   @Get()
-  findAll(@Req() req) {
+  findAll(@Req() req: Request) {
     return this.documentsService.findAll(req.user);
   }
 
@@ -45,6 +48,7 @@ export class DocumentsController {
   @UseGuards(RolesGuard)
   @UseInterceptors(FileInterceptor('file'))
   update(@Param('id', ParseIntPipe) id: number, @UploadedFile() file: Express.Multer.File, @Req() req: Request) {
+    // Even when updating, file might be optional
     return this.documentsService.update(id, file, req.user);
   }
 

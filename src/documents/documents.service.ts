@@ -1,7 +1,12 @@
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { getUniqueFileName, saveFile, deleteFile } from '../utils/file.utils';
-import * as path from 'path';
+import { ROLE } from '@prisma/client';
+
+interface User {
+  id: number;
+  role: ROLE;
+}
 
 @Injectable()
 export class DocumentsService {
@@ -28,7 +33,7 @@ export class DocumentsService {
     return document;
   }
 
-  async findAll(user: any) {
+  async findAll(user: User) {
     // ADMIN can see all documents, others can only see their own
     if (user.role === 'ADMIN') {
       return this.prisma.document.findMany({
@@ -62,7 +67,7 @@ export class DocumentsService {
     });
   }
 
-  async findOne(id: number, user: any) {
+  async findOne(id: number, user: User) {
     const document = await this.prisma.document.findUnique({
       where: { id },
       include: {
@@ -89,7 +94,7 @@ export class DocumentsService {
     return document;
   }
 
-  async update(id: number, file: Express.Multer.File, user: any) {
+  async update(id: number, file: Express.Multer.File, user: User) {
     // Find the existing document
     const existingDoc = await this.prisma.document.findUnique({
       where: { id },
@@ -129,7 +134,7 @@ export class DocumentsService {
     return existingDoc;
   }
 
-  async remove(id: number, user: any) {
+  async remove(id: number, user: User) {
     // Find the document to ensure it exists
     const document = await this.prisma.document.findUnique({
       where: { id },

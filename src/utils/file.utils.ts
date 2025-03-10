@@ -12,6 +12,10 @@ export function getUniqueFileName(fileName: string): string {
 }
 
 export function saveFile(file: Express.Multer.File, customFileName?: string): string {
+  if (!file || typeof file.originalname !== 'string' || !Buffer.isBuffer(file.buffer)) {
+    throw new Error('Invalid file object provided');
+  }
+
   const uploadDir = path.join(process.cwd(), 'docs');
 
   // Create docs directory if it doesn't exist
