@@ -1,8 +1,9 @@
 import * as argon2 from 'argon2';
 import { PrismaService } from '../prisma/prisma.service';
 import { AuthDto } from './dto/auth.dto';
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { VerifyDto } from './dto';
 
 @Injectable()
 export class AuthService {
@@ -45,5 +46,29 @@ export class AuthService {
       }
       throw error;
     }
+  }
+
+  async verify(dto: VerifyDto) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        email: dto.email,
+      },
+      select: {
+        id: true,
+        email: true,
+        username: true,
+        role: true,
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return {
+      status: 'success',
+      message: 'User verified successfully',
+      user,
+    };
   }
 }
