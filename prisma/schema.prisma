@@ -18,12 +18,12 @@ model User {
   username String
   password String
   email    String @unique
-  //role     ROLE
+  role     ROLE
   
 }
 
-// enum ROLE {
-//   ADMIN 
-//   VIEWER
-//   EDITOR
-// }
+enum ROLE {
+  ADMIN 
+  VIEWER
+  EDITOR
+}
