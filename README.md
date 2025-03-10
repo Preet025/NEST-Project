@@ -1,4 +1,4 @@
-# NestJs-Interview
+# NestJs-Project
 
 Coding Exercise for NestJs Backend (User Management and Document Management)
 
